@@ -1,0 +1,139 @@
+syntax = "proto3";
+
+package data_format;
+
+message MinMaxDoublePair {
+  double min = 1;
+  double max = 2;
+}
+
+message Location {
+  double longitude_left = 1;
+  double longitude_right = 2;
+  double latitude_top = 3;
+  double latitude_bottom = 4;
+}
+
+message Config {
+  string name = 1;
+  Location location = 2;
+}
+
+message Climate {
+  enum ZoneType {
+    TropicalWetAndDry = 0;
+    TropicalWet = 1;
+    DesertOrArid = 2;
+    SteppeOrSemiArid = 3;
+    SubtropicalHumid = 4;
+    SubtropicalDrySummer = 5;
+    SubtropicalDryWinter = 6;
+    TemperateOceanic = 7;
+    TemperateContinental = 8;
+    TemperateWithHumidWinters = 9;
+    TemperateWithDryWinters = 10;
+    Boreal = 11;
+    Polar = 12;
+  }
+
+  ZoneType climate_zone = 1;
+  MinMaxDoublePair yearly_temperature = 2;
+  MinMaxDoublePair yearly_rainfall = 3;
+}
+
+message Soil {
+  enum Texture {
+    CLAY = 0;
+    SILT = 1;
+    SAND = 2;
+  }
+
+  message Nutrients {
+    double nitrogen = 1;
+    double phosphorus = 2;
+    double potassium = 3;
+    double calcium = 4;
+    double magnesium = 5;
+    double sulfur = 6;
+  }
+
+  Texture texture = 1;
+  double pH = 2;
+  double salinity = 3;
+  double organic_matter = 4;
+  double water_content = 5;
+}
+
+message Coordinate {
+  double x = 1;
+  double y = 2;
+  double z = 3;
+}
+
+message Plant {
+  enum Maturity {
+    SEED = 0;
+    SEEDLING = 1;
+    JUVENILE = 2;
+    MATURE = 3;
+    OLD = 4;
+  }
+
+  // These comments are copied from the header file environment/plant.h
+  message PlantParams {
+    int32 gdd_base_temperature = 1;       // Temperature above which to accumulate GDD.
+    int32 min_absolute_temperature = 2;   // Lower killing temperature for mature growth.
+    int32 max_absolute_temperature = 3;   // Upper killing temperature for mature growth.
+    int32 min_new_growth_temperature = 4; // Lower killing temperature for new growth.
+    int32 max_new_growth_temperature = 5; // Upper killing temperature for new growth.
+    int32 min_photo_period = 6;           // Minimum photo period for growth.
+    int32 max_photo_period = 7;           // Maximum photo period for growth.
+    int32 max_harvest_yield = 8;          // Maximum yield per cropping period.
+    int32 gdd_units_after_full_bloom = 9; // GDD units needed from full bloom to harvest.
+  }
+
+  string name = 1;
+  double trunk_size = 2;
+  double root_size = 3;
+  int32 health = 4;
+  bool flowering = 5;
+  double height = 6;
+  int32 accumulated_gdd = 7;
+  Maturity maturity = 8;
+  int32 produce = 9;
+  PlantParams params = 10;
+}
+
+message Terrain {
+  message PlantNode {
+    Coordinate position = 1;
+    Plant plant = 2;
+  }
+
+  message SoilNode {
+    Coordinate position = 1;
+    Soil soil = 2;
+  }
+
+  int32 yield = 1;
+  uint32 size = 2;
+
+  repeated PlantNode plants = 3;
+  repeated SoilNode soil = 4;
+}
+
+message Weather {
+  double total_sunshine_hour = 1;
+  MinMaxDoublePair air_temperature = 2;
+  double relative_humidity = 3;
+  double wind_speed = 4;
+  double rainfall = 5;
+}
+
+message Environment {
+  Config config = 1;
+  Climate climate = 2;
+  sint64 timestamp_epoch_count = 3;
+  Terrain terrain = 4;
+  Weather weather = 5;
+}
